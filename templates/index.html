@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Highcharts with Flask</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Choose Chart Type</h1>
+    <select id="chartType">
+        <option value="line">Line Chart</option>
+        <option value="bar">Bar Chart</option>
+        <option value="pie">Pie Chart</option>
+    </select>
+    <button id="loadChart">Load Chart</button>
+
+    <div id="container" style="width: 80%; height: 400px; margin: 0 auto;"></div>
+
+    <script>
+        function loadChart(type) {
+            $.getJSON(`/chart-data?type=${type}`, function(data) {
+                Highcharts.chart('container', {
+                    chart: { type: data.type },
+                    title: { text: `Dynamic ${type.charAt(0).toUpperCase() + type.slice(1)} Chart` },
+                    xAxis: data.categories.length ? { categories: data.categories } : undefined,
+                    yAxis: { title: { text: 'Value' } },
+                    series: data.series
+                });
+            });
+        }
+
+        $(document).ready(function() {
+            // Default load
+            loadChart('line');
+
+            // Load chart on button click
+            $('#loadChart').click(function() {
+                const chartType = $('#chartType').val();
+                loadChart(chartType);
+            });
+        });
+    </script>
+</body>
+</html>
